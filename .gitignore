@@ -1,0 +1,8 @@
+errspl.out
+res.res
+waves.dat
+.gdb_history
+*~
+*.pyc
+*.so
+*.e
