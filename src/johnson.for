@@ -663,6 +663,7 @@ C     write(1) (p(i,ia),i=1,NGP)
          write(19,*) 
  600  continue
       CLOSE(UNIT=19)
+      close(18)
       return
  901  return 
       end
