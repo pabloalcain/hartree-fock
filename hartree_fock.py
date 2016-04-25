@@ -11,6 +11,34 @@ fashion, but until then please report any error you see!
 import numpy as np
 import johnson
 import warnings
+from collections import OrderedDict
+import sys
+
+this = sys.modules[__name__]
+this.orbs = []
+
+_ang = ['s', 'p', 'd', 'f', 'g']
+
+
+def _nl2orb(n, l):
+  """
+  Helper function, converts n and l to a readable orbital
+
+  Parameters
+  ----------
+
+  n : int
+      quantum principal number
+
+  l : int
+      angular momentum
+
+  Returns
+  -------
+  orb : string
+      visual representation of the orbital (1s, 2p, etc)
+  """
+  return str(n)+_ang[l]
 
 def create_atom(z, c=0):
   """
@@ -62,6 +90,7 @@ def add_orbitals(orbital_list):
              "number {1}").format(orb[1], orb[0])
       warnings.warn(msg, UserWarning)
       continue
+    this.orbs.append(orb)
     johnson.add_orbital(*orb)
 
 def set_grid(r0=5e-4, h=0.03):
@@ -90,7 +119,44 @@ def hartree_fock(damp=0.5):
       Damping parameter for the calculation of hartree-fock. Ideally,
       any parameter lower than 1 will converge, but usually a sweet
       spot is near 0.5
+
+  Returns
+  -------
+
+  etot, r, result: float, array, dict
+      etot is the total Hartree-Fock energy, r is the radial grid and
+      result is a dictionary of dictionaries, one per orbital. The
+      entries of results are, for example, '1s' and '2s'. The
+      dictionaries of each orbital, res['1s'] has three keys:
+        - 'energy': the energy of the orbital
+        - 'p': the wavefunction u
+        - 'q': the derivative of u
+
+  Notes
+  -----
+
+  `p` and `q` *are not* the radial wavefunctions and derivative, but
+  rather
+
+  .. math::
+    p(r) = u_{nl}(r) = R_{nl}(r)\,r\\
+    q(r) = u'_{nl}(r) = R'_{nl}(r)\,r + R_{nl}
+
   """
   johnson.hartnr(damp, 0)
   johnson.pickup(0)
-  johnson.output(1.47749, 0)
+  johnson.output(1.0, 0)
+  result = {}
+  energy = {}
+  p = {}
+  q = {}
+  r = johnson.radial.r[:]
+  result = OrderedDict()
+  etot = float(johnson.frontend.etot)
+  for i, orb in enumerate(this.orbs):
+    result[_nl2orb(*orb[:2])] = {}
+    d = result[_nl2orb(*orb[:2])]
+    d['energy'] = float(johnson.fixdat.wf[i])
+    d['p'] = johnson.wavefn.pf[:, i]
+    d['q'] = johnson.wavefn.qf[:, i]
+  return etot, r, result

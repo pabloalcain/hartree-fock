@@ -169,7 +169,8 @@
  100  continue      
       exc = 1.0d0/occ
 
-      write(6,1000) idn
+      open(unit=18, file='iteration.dat')
+      write(18,1000) idn
  1000 format(/' Start Hartree Iteration for ',a/)
       do 300 it = 1,itmax
 
@@ -216,18 +217,18 @@
  220        continue
             dw = -rint(u,1,ma,7,h)
             del = max(del,abs(dw/wf(ja)))
-            write(6,1040) lab(ja),wi(ja),wf(ja),ks(ja)
+            write(18,1040) lab(ja),wi(ja),wf(ja),ks(ja)
  1040       format('  E(',a,') =',2f16.5,6x,'k =',i3)
             wi(ja) = wf(ja) + dw
  250     continue
 
-         write(6,1045) it,del
+         write(18,1045) it,del
  1045    format('  loop ',i3,'   rel-err =',1pe9.1/)
 ***  skip out of loop if del < eps  (1.e-9)
          if(del.lt.eps) go to 350
 
  300  continue
-      write(6,1050)
+      write(18,1050)
  1050 format(' Warning hartree: Iteration has not converged' )
 
  350  continue
@@ -271,20 +272,20 @@
       ifn = 0
       emax = emax0
       del = del0
-      write(6,1000) idn
+      write(18,1000) idn
  1000 format(/'    Hartree-Fock Iteration for ',a/)
       do 100 ja = 1,jc
          k = k + 1
          temp = wf(ja)
          call exchan(ja,del,ifn,*901)
          ddw(ja) = wf(ja) - temp
-         write(6,1010) lab(ja),wf(ja),k
+         write(18,1010) lab(ja),wf(ja),k
  1010    format(2x,a,f16.8,4x,'**********',4x,'initial ',i4)
          k = k + 1
          temp = wf(ja)
          call exchan(ja,del,ifn,*901)
          dw(ja) = wf(ja) - temp
-         write(6,1010) lab(ja),wf(ja),k
+         write(18,1010) lab(ja),wf(ja),k
  100  continue
 
  200  continue
@@ -318,13 +319,13 @@
          temp = wf(ja)
          call exchan(ja,del,ifn,*901)
          dw(ja) = wf(ja) - temp
-         write(6,1020) lab(ja),wf(ja),emax,kk
+         write(18,1020) lab(ja),wf(ja),emax,kk
  1020    format(2x,a,f16.8,4x,1pe10.1,4x,'iterate ',i4)
  500  continue 
 
 ***  too many iterations
 
-      write(6,*) ' Error in pickup: too many iterations'
+      write(18,*) ' Error in pickup: too many iterations'
       return 1
 
 ***   final convergence test   ***
@@ -340,7 +341,7 @@
          dw(ja) = wf(ja) - temp
          emax = abs((ddw(ja)-dw(ja))/wf(ja))
          if(emax.gt.elim) elim = emax
-         write(6,1030) lab(ja),wf(ja),emax,k
+         write(18,1030) lab(ja),wf(ja),emax,k
  1030    format(2x,a,f16.8,4x,1pe10.1,4x,'final   ',i4)
  600  continue
       if(elim.gt.eps) go to 200
@@ -474,7 +475,7 @@
          da = abs((wa-temp)/wa)
          if(da.lt.eps) go to 820
  800  continue
-      write(6,*) ' Error in fock:  norm loop fails to converge'
+      write(18,*) ' Error in fock:  norm loop fails to converge'
       return 1
 
  820  continue
@@ -521,6 +522,7 @@
       common/intdat/jx,jz,jc,ns(NOR),ls(NOR),js(NOR),ms(NOR),ks(NOR)
       common/fixdat/wi(NOR),wf(NOR)
       common/wavefn/p(NGP,NOR),q(NGP,NOR)
+      common/frontend/etot
       dimension u(NGP),v(NGP),w(NGP),rhs(NGP)
       dimension over(NSCAL),icnt(NSCAL),jov(NSCAL,NSCAL)
 
@@ -586,24 +588,24 @@
 ***   print out orbital energies
 
 
-      write(6,1000) idn,jz
+      write(18,1000) idn,jz
  1000 format(/'  Hartree-Fock Energy Levels for ',a,'  Z =',i3/)
-      write(6,1010)
+      write(18,1010)
  1010 format('  Shell','  #el',6x,'  Energy')
 
       do 150 ja = 1,jx
-         write(6,1020) lab(ja),js(ja),wf(ja)
+         write(18,1020) lab(ja),js(ja),wf(ja)
  1020    format(3x,a,i4,f16.6)
  150  continue
 
 ***  print out total energy
 
-      write(6,1025) etot
+      write(18,1025) etot
  1025 format(/3x,'Ehf core',f18.8)
 
 ***   calculate and print scalar products
 
-      write(6,1100)
+      write(18,1100)
  1100 format(/'  *****  scalar products   *****')
 
       ic = 0
@@ -636,31 +638,31 @@
                 over(ins) = rint(u,1,mm,7,h)
                 if(jl.eq.j) over(ins) = over(ins) - 1.0
                 if(jns.eq.1) then
-                   write(6,1200) (lab(jov(ii,ic)),ii = 1,icnt(ic))
+                   write(18,1200) (lab(jov(ii,ic)),ii = 1,icnt(ic))
  1200              format(/11x,8('    ',a,'> '))
                 endif
  230        continue
-            write(6,1210) lab(j),(over(ii),ii=1,ins)
+            write(18,1210) lab(j),(over(ii),ii=1,ins)
  1210       format('  <',a,'|   ',1p,8e10.1)
  240     continue
  260  continue
 
   500 continue
-      write(6,1500)
-      OPEN(UNIT=18, FILE='output.dat')
+      write(18,1500)
+      OPEN(UNIT=19, FILE='output.dat')
 
  1500 format(/)
       do 600 ia = 1,jx
          do i=1,NGP
-            write(18,1800) ns(ia),ls(ia),ms(ia),lab(ia),
+            write(19,1800) ns(ia),ls(ia),ms(ia),lab(ia),
      |           wf(ia),i,r(i),p(i,ia)
          enddo
  1800    format(i2,1x,i2,1x,i4,2x,a4,2x,1pd15.8,i5,2x,
      |        1pd15.8,2x,1pd15.8)
 C     write(1) (p(i,ia),i=1,NGP)
-         write(18,*) 
+         write(19,*) 
  600  continue
-      CLOSE(UNIT=18)
+      CLOSE(UNIT=19)
       return
  901  return 
       end
@@ -717,7 +719,7 @@ C     write(1) (p(i,ia),i=1,NGP)
          wf(jv) = wi(jv)
          call master(phs,qhs,z,wf(jv),ns(jv),ls(jv),
      &                    ms(jv),ks(jv),*901)
-         write(6,1000) lab(jv),lab(jv),wf(jv),ept,ks(jv)
+         write(18,1000) lab(jv),lab(jv),wf(jv),ept,ks(jv)
  1000    format(/5x,'Valence Iteration Loop for ',a,' shell'//
      1          2x,a,f16.8,4x,f10.1,4x,'initial ',i4)
 *        write(6,1000) wi(jv),wf(jv),ks(jv)
@@ -841,13 +843,13 @@ C     write(1) (p(i,ia),i=1,NGP)
                ernorm = abs(wf(jv)-tempn)
                if(ernorm.lt.enorm) go to 390
  380        continue
-            write(6,*) ' Error in valence: too many norm iterations'
+            write(18,*) ' Error in valence: too many norm iterations'
             return 1
  390        continue
 
             err = abs(( wf(jv) - temp )/wf(jv))
 
-            write(6,1030) lab(jv),wf(jv),err,it
+            write(18,1030) lab(jv),wf(jv),err,it
  1030       format(2x,a,f16.8,4x,1pe10.1,4x,'iterate ',i4)
 
 *           write(6,1030) it, wf(jv), err
@@ -856,7 +858,7 @@ C     write(1) (p(i,ia),i=1,NGP)
 
             if(err.le.eps) go to 450
  400     continue
-         write(6,*) ' Error in valence: too many exchange iterations'
+         write(18,*) ' Error in valence: too many exchange iterations'
          return 1
  450     continue
 
@@ -965,11 +967,11 @@ C     write(1) (p(i,ia),i=1,NGP)
          if(dw.gt.eps) go to 200
  100  continue
       return
- 200  write(6,1000)
+ 200  write(18,1000)
  1000 format(/' Constancy of the wronskian :')
       do 300 i = ma,mb,mc
          w = (q2(i)*p1(i) - p2(i)*q1(i))/wr
-         write(6,1200) i,w
+         write(18,1200) i,w
  1200    format(i6,1pd20.7)
  300  continue 
       return
