@@ -32,13 +32,13 @@
       js(jx) = O
       call enclab(N, L, *901)
       lab(jx) = label
-      if (jc.eq.0) then
+      if (jc.eq.0.or.jx.lt.jc) then
          js(jx) = 4*ls(jx) + 2
          ns(NOR) = ns(NOR) + js(jx)
          wi(jx)=-jz**2/(2.0d0*N**2)
       else
-         if (ja.gt.jc) then
-            js(jx) = 1
+         if (jx.ge.jc) then
+            js(jx) = 0
             wi(jx) = -(jz-ncore)**2/(2.0d0*N**2)
          endif
       endif
@@ -47,7 +47,7 @@
  901  return 1
       end
 
-      SUBROUTINE SETGRID(R0, IH)
+      SUBROUTINE SET_GRID(R0, IH)
       implicit real*8(a-h,o-z)
       parameter(NGP=500,NOR=30)
       character*4 idn,lab,label

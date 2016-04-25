@@ -579,12 +579,12 @@
  90   continue
 
 ***   calculate valence wave functions and energies
-
       if(jx.gt.jc) then
          call valenc(*901)
       endif
 
 ***   print out orbital energies
+
 
       write(6,1000) idn,jz
  1000 format(/'  Hartree-Fock Energy Levels for ',a,'  Z =',i3/)
@@ -647,7 +647,7 @@
 
   500 continue
       write(6,1500)
-      OPEN(UNIT=18, FILE=IDN//'.dat')
+      OPEN(UNIT=18, FILE='output.dat')
 
  1500 format(/)
       do 600 ia = 1,jx
@@ -743,7 +743,6 @@ C     write(1) (p(i,ia),i=1,NGP)
          err = 1.0
          del  = 1.0d-3
          do 400 it = 1,itmax
-
 ***   set accuracy for norm calculation in routine solve
             if(err.lt.1.0d-8)  then
                del = 1.0d-11
@@ -1237,7 +1236,7 @@ C     write(1) (p(i,ia),i=1,NGP)
       dimension p(NGP),q(NGP),z(NGP)
       dimension u(NGP)
       data del/1.0d-11/,ntry/30/,alr/800.0d0/
-      
+
       eupper=0.0d0
       elower=0.0d0
       more=0
@@ -1253,7 +1252,6 @@ C     write(1) (p(i,ia),i=1,NGP)
          k = k - 1
          return 1
       endif
-
 ****  seek practical infinity:  m
 * 
 *       p(r(m)) = exp(- alam r(m) )
@@ -1810,7 +1808,7 @@ c
 
       subroutine enclab(n,k,*)
 c
-c  this program encodes the principal and angular quantum numbers 'n'
+c  this program encodes the pricnipal and angular quantum numbers 'n'
 c  and 'l' into an orbital label 'lab'
 c
       implicit character*1(l)
