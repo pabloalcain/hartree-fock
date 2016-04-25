@@ -10,7 +10,7 @@ library: johnson.so
 
 executable: johnson.e
 
-johnson.so: johnson.for
+johnson.so: frontend.for johnson.for
 	f2py -c $^ -m johnson
 	cp johnson.so ..
 

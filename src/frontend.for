@@ -1,18 +1,32 @@
-      SUBROUTINE ATOM(Z, C)
+      SUBROUTINE ATOM(IZ, C)
+      implicit real*8(a-h,o-z)
+      integer C, IZ
       parameter(NGP=500,NOR=30)
+      character*4 idn,lab,label
+      common/radial/r(NGP),rp(NGP),rpor(NGP),h
+      common/labdat/idn,lab(NOR)
       common/intdat/jx,jz,jc,ns(NOR),ls(NOR),js(NOR),ms(NOR),ks(NOR)
-      jz = Z
+      common/fixdat/wi(NOR),wf(NOR)
+      common/charge/z(NGP)
+      common/orblab/label
+      data r0def /0.0005d0/, hdef/0.03d0/
+      jz = IZ
       jx = 1
       jc = C
       ns (NOR) = 0 ! placeholder for ncore
       END
 
       SUBROUTINE ADD_ORBITAL(N, L, O)
+      implicit real*8(a-h,o-z)
       parameter(NGP=500,NOR=30)
-      common/intdat/jx,jz,jc,ns(NOR),ls(NOR),js(NOR),ms(NOR),ks(NOR)
+      character*4 idn,lab,label
+      common/radial/r(NGP),rp(NGP),rpor(NGP),h
       common/labdat/idn,lab(NOR)
+      common/intdat/jx,jz,jc,ns(NOR),ls(NOR),js(NOR),ms(NOR),ks(NOR)
       common/fixdat/wi(NOR),wf(NOR)
+      common/charge/z(NGP)
       common/orblab/label
+      data r0def /0.0005d0/, hdef/0.03d0/
       ns(jx) = N
       ls(jx) = L
       js(jx) = O
@@ -34,11 +48,22 @@
       end
 
       SUBROUTINE SETGRID(R0, IH)
+      implicit real*8(a-h,o-z)
       parameter(NGP=500,NOR=30)
       character*4 idn,lab,label
       common/radial/r(NGP),rp(NGP),rpor(NGP),h
+      common/labdat/idn,lab(NOR)
+      common/intdat/jx,jz,jc,ns(NOR),ls(NOR),js(NOR),ms(NOR),ks(NOR)
+      common/fixdat/wi(NOR),wf(NOR)
       common/charge/z(NGP)
+      common/orblab/label
+      data r0def /0.0005d0/, hdef/0.03d0/
 
+      ns (NOR) = 0 ! clean placeholder ncore
+      if (jc.eq.0) then
+         jc = jx - 1
+      ENDIF
+      jx = jx - 1
       if(r0.eq.0.0)  r0 = r0def
       if(h.eq.0.0)   h = hdef
       else h = ih

@@ -171,7 +171,6 @@
 
       write(6,1000) idn
  1000 format(/' Start Hartree Iteration for ',a/)
-
       do 300 it = 1,itmax
 
 ***  rho(i) = charge density
@@ -1248,6 +1247,7 @@ C     write(1) (p(i,ia),i=1,NGP)
 
 ****  k = number of trys at solution  <= ntry  (ntry = 30)
       k = 0
+
  100  k = k + 1
       if(k.gt.ntry) then
          k = k - 1
