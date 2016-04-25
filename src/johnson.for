@@ -648,18 +648,22 @@
 
   500 continue
       write(6,1500)
+      OPEN(UNIT=18, FILE=IDN//'.dat')
+
  1500 format(/)
-      open(unit=1,file='fort.1',form='unformatted',status='unknown')
-      rewind 1
-      write(1) idn,jz,jx,jc
-      write(1) r,rp,rpor,h
       do 600 ia = 1,jx
-          write(1) ns(ia),ls(ia),ms(ia),lab(ia),wf(ia)
-          write(1) (p(i,ia),i=1,NGP)
+         do i=1,NGP
+            write(18,1800) ns(ia),ls(ia),ms(ia),lab(ia),
+     |           wf(ia),i,r(i),p(i,ia)
+         enddo
+ 1800    format(i2,1x,i2,1x,i4,2x,a4,2x,1pd15.8,i5,2x,
+     |        1pd15.8,2x,1pd15.8)
+C     write(1) (p(i,ia),i=1,NGP)
+         write(18,*) 
  600  continue
-      rewind 1
+      CLOSE(UNIT=18)
       return
- 901  return 1
+ 901  return 
       end
 
       subroutine valenc(*)
